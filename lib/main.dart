@@ -180,27 +180,76 @@ Widget buildExerciseSelectorPage(RouteArgs args) => Scaffold(
 
 // ----- Exercise View Page -----
 
-// This view allows the user to add sets to this exercise (for todays workout), and also view historical data.
-Widget buildExerciseViewPage(RouteArgs args) => Scaffold(
-  appBar: AppBar(title: Text('Exercise Details for ${args.exerciseName} in ${args.workout.name}')),
-  body: ListView.builder(
-    itemCount: args.workout.exercises
-        .firstWhere((e) => e.name == args.exerciseName)
-        .sets.length,
-    itemBuilder: (context, index) {
-      final exercise = args.workout.exercises
-          .firstWhere((e) => e.name == args.exerciseName);
-      final set = exercise.sets[index];
-      return buildExerciseSetTile(index, set);
-    },
-  ),
-  floatingActionButton: FloatingActionButton(
-    onPressed: () {
-      addDummySetToExercise(args.appState, args.workout.name, args.exerciseName);
-    },
-    child: Icon(Icons.add),
-  ),
-);
+// This view allows the user to add sets to this exercise (for today's workout), and also view historical data.
+Widget buildExerciseViewPage(RouteArgs args) {
+  final exercise = args.workout.exercises.firstWhere((e) => e.name == args.exerciseName);
+
+  return DefaultTabController(
+    length: 2,
+    child: Scaffold(
+      appBar: AppBar(
+        title: Text('Exercise Details for ${args.exerciseName} in ${args.workout.name}'),
+        bottom: TabBar(
+          tabs: [
+            Tab(text: 'Track'),
+            Tab(text: 'History'),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        children: [
+          // Track Tab: Add/view sets for this workout
+          Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: exercise.sets.length,
+                  itemBuilder: (context, index) {
+                    final set = exercise.sets[index];
+                    return buildExerciseSetTile(index, set);
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(16),
+                child: ElevatedButton.icon(
+                  icon: Icon(Icons.add),
+                  label: Text('Add Set'),
+                  onPressed: () {
+                    addDummySetToExercise(args.appState, args.workout.name, args.exerciseName);
+                  },
+                ),
+              ),
+            ],
+          ),
+          // History Tab: Show all sets for this exercise across all workouts
+          Builder(
+            builder: (context) {
+              final allSets = args.appState.workouts.value
+                  .where((w) => w != null)
+                  .expand((w) => w!.exercises)
+                  .where((ex) => ex.name == args.exerciseName)
+                  .expand((ex) => ex.sets)
+                  .toList();
+
+              if (allSets.isEmpty) {
+                return Center(child: Text('No historical sets found.'));
+              }
+
+              return ListView.builder(
+                itemCount: allSets.length,
+                itemBuilder: (context, index) {
+                  final set = allSets[index];
+                  return buildExerciseSetTile(index, set);
+                },
+              );
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
 Widget buildExerciseSetTile(int index, ExerciseSet set) => Card(
   child: ExpansionTile(

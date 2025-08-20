@@ -47,6 +47,7 @@ Widget buildHome(AppState appState) => Scaffold(
   body: PageView.builder(
     scrollDirection: Axis.horizontal,
     controller: PageController(viewportFraction: 0.95),
+    //Todo instead of having nullable workouts and 10 blank pages, just have one extra page
     itemCount: (appState.workouts.value.isNotEmpty) ? appState.workouts.value.length + 10 : 10,
     itemBuilder: (_, i) {
       final workouts = appState.workouts.value;

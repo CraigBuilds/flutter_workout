@@ -9,32 +9,32 @@ void main() async {
 
 // ----- App -----
 
-Widget buildApp(Workouts workouts) => MaterialApp(
-  title: 'Functional Workout App',
-  home: buildHome(workouts)
+Widget buildApp(Workouts workouts) => ValueListenableBuilder<List<Workout?>>(
+  valueListenable: workouts,
+  builder: (_, workoutList, __) {
+    return MaterialApp(
+      title: 'Functional Workout App',
+      home: buildHome(workouts, workoutList),
+    );
+  },
 );
 
 // ----- Home Page -----
 
-Widget buildHome(Workouts workouts) => Scaffold(
+Widget buildHome(Workouts workouts, List<Workout?> workoutList) => Scaffold(
   appBar: AppBar(title: Text('Workouts')),
-  body: ValueListenableBuilder<List<Workout?>>(
-    valueListenable: workouts,
-    builder: (_, workoutList, __) {
-      return PageView.builder(
-        scrollDirection: Axis.horizontal,
-        controller: PageController(viewportFraction: 0.95),
-        itemCount: workoutList.isEmpty ? 10 : workoutList.length + 10,
-        itemBuilder: (_, i) {
-          if (i >= workoutList.length) {
-            return buildBlankPane(workouts, i);
-          }
-          if (workoutList[i] == null) {
-            return buildBlankPane(workouts, i);
-          }
-          return buildWorkoutPane(workouts, i);
-        },
-      );
+  body: PageView.builder(
+    scrollDirection: Axis.horizontal,
+    controller: PageController(viewportFraction: 0.95),
+    itemCount: workoutList.isEmpty ? 10 : workoutList.length + 10,
+    itemBuilder: (_, i) {
+      if (i >= workoutList.length) {
+        return buildBlankPane(workouts, i);
+      }
+      if (workoutList[i] == null) {
+        return buildBlankPane(workouts, i);
+      }
+      return buildWorkoutPane(workouts, i);
     },
   ),
 );

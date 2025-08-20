@@ -21,9 +21,15 @@ Widget buildApp(Context context) => MaterialApp(
   title: 'Functional Workout App',
   home: buildHome(context),
   routes: {
-    '/exercise_selector': (_) => buildExerciseSelector(),
+    '/exercise_selector': (_) => buildExerciseSelectorPage(),
     '/about': (_) => buildAboutPage(),
   },
+  // Use onGenerateRoute only for routes needing arguments
+  onGenerateRoute: (settings) => settings.name == '/exercise'
+      ? MaterialPageRoute(
+          builder: (_) => buildExercisePage(settings.arguments as String),
+        )
+      : null,
 );
 
 // ----- Home Page -----
@@ -34,15 +40,11 @@ Widget buildHome(Context context) => Scaffold(
   body: PageView.builder(
     scrollDirection: Axis.horizontal,
     controller: PageController(viewportFraction: 0.95),
-    itemCount: context.workouts.value.isEmpty ? 10 : context.workouts.value.length + 10,
+    itemCount: (context.workouts.value.isNotEmpty) ? context.workouts.value.length + 10 : 10,
     itemBuilder: (_, i) {
-      if (i >= context.workouts.value.length) {
-        return buildBlankPane(context, i);
-      }
-      if (context.workouts.value[i] == null) {
-        return buildBlankPane(context, i);
-      }
-      return buildWorkoutPane(context, i);
+      final workouts = context.workouts.value;
+      final isWorkoutPane = i < workouts.length && workouts[i] != null;
+      return isWorkoutPane ? buildWorkoutPane(context, i) : buildBlankPane(context, i);
     },
   ),
   floatingActionButton: Builder(
@@ -66,23 +68,28 @@ Widget buildWorkoutPane(Context context, int index) => Card(
   ),
 );
 
-Widget buildWorkoutPaneChildren(Context context, int index) => Expanded(
-  child: SingleChildScrollView(
-    child: Column(
-      children: [
-        ...context.workouts.value[index]!.exercises
-            .map((exercise) => buildExerciseTile(exercise)),
-        Card(
-          margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-          child: ListTile(
-            leading: Icon(Icons.add),
-            title: Text('Add Exercise'),
-            onTap: () {
-              // todo: add exercise to workout. This should navigate to exercise selector, and then exercise view
-            },
-          ),
-        ),
-      ],
+Widget buildWorkoutPaneChildren(Context context, int index) => 
+  Expanded(
+    child: SingleChildScrollView(
+      child: Column(
+        children: [
+          ...context.workouts.value[index]!.exercises
+              .map((exercise) => buildExerciseTile(exercise)),
+          buildAddExerciseButton(),
+        ],
+      ),
+    ),
+  );
+
+Widget buildAddExerciseButton() => Builder(
+  builder: (context) => Card(
+    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+    child: ListTile(
+      leading: Icon(Icons.add),
+      title: Text('Add Exercise'),
+      onTap: () {
+        Navigator.of(context).pushNamed('/exercise_selector');
+      },
     ),
   ),
 );
@@ -112,13 +119,33 @@ Widget buildExerciseTile(Exercise exercise) => Card(
   ),
 );
 
-// ----- Exercise Selector -----
+// ----- Exercise Selector Page -----
 
-// This widget allows users to select exercises from a tree structure. It is a new page in the app.
-Widget buildExerciseSelector() => Scaffold(
+// This view allows users to select exercises from a tree structure. It is a new page in the app.
+Widget buildExerciseSelectorPage() => Scaffold(
   appBar: AppBar(title: Text('Select Exercise')),
+  body: Builder(
+    builder: (context) => ListView(
+      children: [
+        ListTile(
+          title: Text('Push Ups'),
+          onTap: () {
+            Navigator.of(context).pushNamed('/exercise', arguments: 'Push Ups');
+          }
+        )
+        // Add more exercises here
+      ],
+    ),
+  ),
+);
+
+// ----- Exercise Page -----
+
+// This view allows the user to add sets to this exercise (for todays workout), and also view historical data.
+Widget buildExercisePage(String exerciseName) => Scaffold(
+  appBar: AppBar(title: Text('Exercise Details')),
   body: Center(
-    child: Text('Exercise Selector Placeholder'),
+    child: Text('Exercise Main View Placeholder for $exerciseName'),
   ),
 );
 

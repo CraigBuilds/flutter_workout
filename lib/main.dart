@@ -3,55 +3,55 @@ import 'data_models.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final context = Context(ValueNotifier<List<Workout?>>([]));
-  runApp(buildRoot(context));
+  final appState = AppState(ValueNotifier<List<Workout?>>([]));
+  runApp(buildRoot(appState));
 }
 
 // ----- Root -----
 
-Widget buildRoot(Context context) => ValueListenableBuilder<List<Workout?>>(
-  valueListenable: context.workouts,
-  builder: (_, __, ___) => buildApp(context),
+Widget buildRoot(AppState appState) => ValueListenableBuilder<List<Workout?>>(
+  valueListenable: appState.workouts,
+  builder: (_, __, ___) => buildApp(appState),
 );
 
 // ----- App -----
 
-//This is rebuilt by root whenever context.workouts changes
-Widget buildApp(Context context) => MaterialApp(
+//This is rebuilt by root whenever appState.workouts changes
+Widget buildApp(AppState appState) => MaterialApp(
   title: 'Functional Workout App',
-  home: buildHome(context),
+  home: buildHome(appState),
   routes: {
     '/about': (_) => buildAboutPage(),
   },
   onGenerateRoute: (settings) {
-    if (settings.name == '/exercise_selector') {
-      final workoutToAddTo = settings.arguments as Workout;
-      return MaterialPageRoute(
-        builder: (_) => buildExerciseSelectorPage(workoutToAddTo),
-      );
-    } else if (settings.name == '/exercise_view') {
-      final args = settings.arguments as ExerciseViewArgs;
-      return MaterialPageRoute(
-        builder: (_) => buildExerciseViewPage(args),
-      );
+    final RouteArgs args = settings.arguments as RouteArgs;
+    switch (settings.name) {
+      case '/exercise_selector':
+        return MaterialPageRoute(
+          builder: (_) => buildExerciseSelectorPage(args),
+        );
+      case '/exercise_view':
+        return MaterialPageRoute(
+          builder: (_) => buildExerciseViewPage(args),
+        );
     }
-    return null; // Handle other routes or return null
+    return null;
   },
 );
 
 // ----- Home Page -----
 
-Widget buildHome(Context context) => Scaffold(
+Widget buildHome(AppState appState) => Scaffold(
   appBar: AppBar(title: Text('Workouts')),
   //PageView.builder is used to dynamically create pages for each workout
   body: PageView.builder(
     scrollDirection: Axis.horizontal,
     controller: PageController(viewportFraction: 0.95),
-    itemCount: (context.workouts.value.isNotEmpty) ? context.workouts.value.length + 10 : 10,
+    itemCount: (appState.workouts.value.isNotEmpty) ? appState.workouts.value.length + 10 : 10,
     itemBuilder: (_, i) {
-      final workouts = context.workouts.value;
+      final workouts = appState.workouts.value;
       final isWorkoutPane = i < workouts.length && workouts[i] != null;
-      return isWorkoutPane ? buildWorkoutPane(context, i) : buildBlankPane(context, i);
+      return isWorkoutPane ? buildWorkoutPane(appState, i) : buildBlankPane(appState, i);
     },
   ),
   floatingActionButton: Builder(
@@ -64,47 +64,51 @@ Widget buildHome(Context context) => Scaffold(
 
 // ----- Workout Pane -----
 
-Widget buildWorkoutPane(Context context, int index) => Card(
+Widget buildWorkoutPane(AppState appState, int index) => Card(
   child: Column(
     children: [
       ListTile(
-        title: Text(context.workouts.value[index]!.name),
+        title: Text(appState.workouts.value[index]!.name),
       ),
-      buildWorkoutPaneChildren(context, index),
+      buildWorkoutPaneChildren(appState, index),
     ],
   ),
 );
 
-Widget buildWorkoutPaneChildren(Context context, int index) => 
+Widget buildWorkoutPaneChildren(AppState appState, int index) => 
   Expanded(
     child: SingleChildScrollView(
       child: Column(
         children: [
-          ...context.workouts.value[index]!.exercises
-              .map((exercise) => buildExerciseTile(exercise, context.workouts.value[index]!)),
-          buildAddExerciseButton(context.workouts.value[index]!),
+          ...appState.workouts.value[index]!.exercises
+              .map((exercise) => buildExerciseTile(appState, exercise, appState.workouts.value[index]!)),
+          buildAddExerciseButton(appState, appState.workouts.value[index]!),
         ],
       ),
     ),
   );
 
-Widget buildAddExerciseButton(Workout workoutToAddTo) => Builder(
+Widget buildAddExerciseButton(AppState appState, Workout workoutToAddTo) => Builder(
   builder: (context) => Card(
     margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
     child: ListTile(
       leading: Icon(Icons.add),
       title: Text('Add Exercise'),
       onTap: () {
-        Navigator.of(context).pushNamed('/exercise_selector', arguments: workoutToAddTo);
+        Navigator.of(context).pushNamed('/exercise_selector', arguments: RouteArgs(
+          appState: appState,
+          exerciseName: '',
+          workout: workoutToAddTo,
+        ));
       },
     ),
   ),
 );
 
-Widget buildBlankPane(Context context, int index) => Card(
+Widget buildBlankPane(AppState appState, int index) => Card(
   child: Center(
     child: ElevatedButton(
-      onPressed: () => addDummyWorkout(context, index),
+      onPressed: () => addDummyWorkout(appState, index),
       child: Text('Add Workout'),
     ),
   ),
@@ -112,7 +116,7 @@ Widget buildBlankPane(Context context, int index) => Card(
 
 // ----- Exercise Tile -----
 
-Widget buildExerciseTile(Exercise exercise, Workout workoutToAddTo) => Card(
+Widget buildExerciseTile(AppState appState,Exercise exercise, Workout workoutToAddTo) => Card(
   color: Colors.grey[200], // Add background color
   margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
   child: Builder(
@@ -125,7 +129,8 @@ Widget buildExerciseTile(Exercise exercise, Workout workoutToAddTo) => Card(
         }).toList(),
       ),
       onTap: () {
-        Navigator.of(context).pushNamed('/exercise_view', arguments: ExerciseViewArgs(
+        Navigator.of(context).pushNamed('/exercise_view', arguments: RouteArgs(
+          appState: appState,
           exerciseName: exercise.name,
           workout: workoutToAddTo,
         ));
@@ -134,10 +139,24 @@ Widget buildExerciseTile(Exercise exercise, Workout workoutToAddTo) => Card(
   ),
 );
 
+// ----- Pages -----
+
+class RouteArgs {
+  AppState appState;
+  String exerciseName;
+  Workout workout;
+
+  RouteArgs({
+    required this.appState,
+    required this.exerciseName,
+    required this.workout,
+  });
+}
+
 // ----- Exercise Selector Page -----
 
 // This view allows users to select exercises from a tree structure. It is a new page in the app.
-Widget buildExerciseSelectorPage(Workout workoutToAddTo) => Scaffold(
+Widget buildExerciseSelectorPage(RouteArgs args) => Scaffold(
   appBar: AppBar(title: Text('Select Exercise')),
   body: Builder(
     builder: (context) => ListView(
@@ -145,9 +164,11 @@ Widget buildExerciseSelectorPage(Workout workoutToAddTo) => Scaffold(
         ListTile(
           title: Text('Push Ups'),
           onTap: () {
-            Navigator.of(context).pushNamed('/exercise_view', arguments: ExerciseViewArgs(
+            addExerciseToWorkout(args.appState, args.workout.name, 'Push Ups');
+            Navigator.of(context).pushNamed('/exercise_view', arguments: RouteArgs(
+              appState: args.appState,
               exerciseName: 'Push Ups',
-              workout: workoutToAddTo,
+              workout: args.workout,
             ));
           },
         )
@@ -159,21 +180,28 @@ Widget buildExerciseSelectorPage(Workout workoutToAddTo) => Scaffold(
 
 // ----- Exercise View Page -----
 
-class ExerciseViewArgs {
-  String exerciseName;
-  Workout workout;
-
-  ExerciseViewArgs({
-    required this.exerciseName,
-    required this.workout,
-  });
-}
-
 // This view allows the user to add sets to this exercise (for todays workout), and also view historical data.
-Widget buildExerciseViewPage(ExerciseViewArgs args) => Scaffold(
-  appBar: AppBar(title: Text('Exercise Details')),
-  body: Center(
-    child: Text('Exercise Main View Placeholder for ${args.exerciseName} in ${args.workout.name}'),
+Widget buildExerciseViewPage(RouteArgs args) => Scaffold(
+  appBar: AppBar(title: Text('Exercise Details for ${args.exerciseName} in ${args.workout.name}')),
+  body: ListView.builder(
+    itemCount: args.workout.exercises
+        .firstWhere((e) => e.name == args.exerciseName)
+        .sets.length,
+    itemBuilder: (context, index) {
+      final exercise = args.workout.exercises
+          .firstWhere((e) => e.name == args.exerciseName);
+      final set = exercise.sets[index];
+      return ListTile(
+        title: Text('Set ${index + 1}'),
+        subtitle: Text('${set.reps} reps @ ${set.weight} kg'),
+      );
+    },
+  ),
+  floatingActionButton: FloatingActionButton(
+    onPressed: () {
+      addDummySetToExercise(args.appState, args.workout.name, args.exerciseName);
+    },
+    child: Icon(Icons.add),
   ),
 );
 

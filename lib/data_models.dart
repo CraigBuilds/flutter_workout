@@ -22,18 +22,18 @@ class ExerciseSet {
   ExerciseSet({required this.reps, required this.weight});
 }
 
-class Context {
+class AppState {
   final ValueNotifier<List<Workout?>> workouts;
 
-  Context(this.workouts);
+  AppState(this.workouts);
 }
 
 // ----- State -----
 
 
-void addDummyWorkout(Context context, int index) {
+void addDummyWorkout(AppState appState, int index) {
   final newWorkout = Workout(
-    name: 'Workout ${context.workouts.value.length + 1}',
+    name: 'Workout ${appState.workouts.value.length + 1}',
     exercises: [
       Exercise(
         name: 'Bench Press',
@@ -53,10 +53,27 @@ void addDummyWorkout(Context context, int index) {
 
   // Assign a new list to the ValueNotifier value. The newWorkout should be placed at the given index.
   // If the index is greater than the current length, pad with nulls (this is done by increasing the length)
-  final newList = List<Workout?>.from(context.workouts.value);
+  final newList = List<Workout?>.from(appState.workouts.value);
   if (index >= newList.length) {
     newList.length = index + 1;
   }
   newList[index] = newWorkout;
-  context.workouts.value = newList;
+  appState.workouts.value = newList;
+}
+
+void addExerciseToWorkout(AppState appState, String workoutName, String exerciseName) {
+  final newList = List<Workout?>.from(appState.workouts.value);
+  final workout = newList.firstWhere((w) => w?.name == workoutName);
+  if (workout == null) return;
+  workout.exercises.add(Exercise(name: exerciseName, sets: []));
+  appState.workouts.value = newList;
+}
+
+void addDummySetToExercise(AppState appState, String workoutName, String exerciseName) {
+  //remember to replace the workouts field of context so a rebuild is triggered
+  final newList = List<Workout?>.from(appState.workouts.value);
+  final workout = newList.firstWhere((w) => w?.name == workoutName);
+  final exercise = workout!.exercises.firstWhere((e) => e.name == exerciseName);
+  exercise.sets.add(ExerciseSet(reps: 10, weight: 50.0));
+  appState.workouts.value = newList;
 }

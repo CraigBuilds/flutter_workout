@@ -75,23 +75,22 @@ Widget buildWorkoutPane(AppState appState, int index) => Card(
   ),
 );
 
-Widget buildWorkoutPaneChildren(AppState appState, int index) => 
-  Expanded(
-    child: SingleChildScrollView(
-      child: Column(
-        children: [
-          ...appState.workouts.value[index]!.exercises
-              .map((exercise) => buildExerciseTile(appState, exercise, appState.workouts.value[index]!)),
-          buildAddExerciseButton(appState, appState.workouts.value[index]!),
-        ],
-      ),
+Widget buildWorkoutPaneChildren(AppState appState, int index) => Expanded(
+  child: SingleChildScrollView(
+    child: Column(
+      children: [
+        ...appState.workouts.value[index]!.exercises
+            .map((exercise) => buildExerciseTile(appState, exercise, appState.workouts.value[index]!)),
+        buildAddExerciseButton(appState, appState.workouts.value[index]!),
+      ],
     ),
-  );
+  ),
+);
 
-Widget buildAddExerciseButton(AppState appState, Workout workoutToAddTo) => Builder(
-  builder: (context) => Card(
-    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-    child: ListTile(
+Widget buildAddExerciseButton(AppState appState, Workout workoutToAddTo) => Card(
+  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+  child: Builder(
+    builder: (context) => ListTile(
       leading: Icon(Icons.add),
       title: Text('Add Exercise'),
       onTap: () {
@@ -116,7 +115,7 @@ Widget buildBlankPane(AppState appState, int index) => Card(
 
 // ----- Exercise Tile -----
 
-Widget buildExerciseTile(AppState appState,Exercise exercise, Workout workoutToAddTo) => Card(
+Widget buildExerciseTile(AppState appState, Exercise exercise, Workout workoutToAddTo) => Card(
   color: Colors.grey[200], // Add background color
   margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
   child: Builder(

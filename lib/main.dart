@@ -108,13 +108,18 @@ Widget buildBlankPane(Context context, int index) => Card(
 Widget buildExerciseTile(Exercise exercise) => Card(
   color: Colors.grey[200], // Add background color
   margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-  child: ListTile(
-    title: Text(exercise.name),
-    subtitle: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: exercise.sets.map((set) {
-        return Text('Set: ${set.reps} reps @ ${set.weight} kg');
-      }).toList(),
+  child: Builder(
+    builder: (context) => ListTile(
+      title: Text(exercise.name),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: exercise.sets.map((set) {
+          return Text('Set: ${set.reps} reps @ ${set.weight} kg');
+        }).toList(),
+      ),
+      onTap: () {
+        Navigator.of(context).pushNamed('/exercise', arguments: exercise.name);
+      },
     ),
   ),
 );

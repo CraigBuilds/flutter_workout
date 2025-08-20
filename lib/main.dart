@@ -21,15 +21,22 @@ Widget buildApp(Context context) => MaterialApp(
   title: 'Functional Workout App',
   home: buildHome(context),
   routes: {
-    '/exercise_selector': (_) => buildExerciseSelectorPage(),
     '/about': (_) => buildAboutPage(),
   },
-  // Use onGenerateRoute only for routes needing arguments
-  onGenerateRoute: (settings) => settings.name == '/exercise'
-      ? MaterialPageRoute(
-          builder: (_) => buildExercisePage(settings.arguments as String),
-        )
-      : null,
+  onGenerateRoute: (settings) {
+    if (settings.name == '/exercise_selector') {
+      final workoutToAddTo = settings.arguments as Workout;
+      return MaterialPageRoute(
+        builder: (_) => buildExerciseSelectorPage(workoutToAddTo),
+      );
+    } else if (settings.name == '/exercise_view') {
+      final args = settings.arguments as ExerciseViewArgs;
+      return MaterialPageRoute(
+        builder: (_) => buildExerciseViewPage(args),
+      );
+    }
+    return null; // Handle other routes or return null
+  },
 );
 
 // ----- Home Page -----
@@ -74,21 +81,21 @@ Widget buildWorkoutPaneChildren(Context context, int index) =>
       child: Column(
         children: [
           ...context.workouts.value[index]!.exercises
-              .map((exercise) => buildExerciseTile(exercise)),
-          buildAddExerciseButton(),
+              .map((exercise) => buildExerciseTile(exercise, context.workouts.value[index]!)),
+          buildAddExerciseButton(context.workouts.value[index]!),
         ],
       ),
     ),
   );
 
-Widget buildAddExerciseButton() => Builder(
+Widget buildAddExerciseButton(Workout workoutToAddTo) => Builder(
   builder: (context) => Card(
     margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
     child: ListTile(
       leading: Icon(Icons.add),
       title: Text('Add Exercise'),
       onTap: () {
-        Navigator.of(context).pushNamed('/exercise_selector');
+        Navigator.of(context).pushNamed('/exercise_selector', arguments: workoutToAddTo);
       },
     ),
   ),
@@ -105,7 +112,7 @@ Widget buildBlankPane(Context context, int index) => Card(
 
 // ----- Exercise Tile -----
 
-Widget buildExerciseTile(Exercise exercise) => Card(
+Widget buildExerciseTile(Exercise exercise, Workout workoutToAddTo) => Card(
   color: Colors.grey[200], // Add background color
   margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
   child: Builder(
@@ -118,7 +125,10 @@ Widget buildExerciseTile(Exercise exercise) => Card(
         }).toList(),
       ),
       onTap: () {
-        Navigator.of(context).pushNamed('/exercise', arguments: exercise.name);
+        Navigator.of(context).pushNamed('/exercise_view', arguments: ExerciseViewArgs(
+          exerciseName: exercise.name,
+          workout: workoutToAddTo,
+        ));
       },
     ),
   ),
@@ -127,7 +137,7 @@ Widget buildExerciseTile(Exercise exercise) => Card(
 // ----- Exercise Selector Page -----
 
 // This view allows users to select exercises from a tree structure. It is a new page in the app.
-Widget buildExerciseSelectorPage() => Scaffold(
+Widget buildExerciseSelectorPage(Workout workoutToAddTo) => Scaffold(
   appBar: AppBar(title: Text('Select Exercise')),
   body: Builder(
     builder: (context) => ListView(
@@ -135,8 +145,11 @@ Widget buildExerciseSelectorPage() => Scaffold(
         ListTile(
           title: Text('Push Ups'),
           onTap: () {
-            Navigator.of(context).pushNamed('/exercise', arguments: 'Push Ups');
-          }
+            Navigator.of(context).pushNamed('/exercise_view', arguments: ExerciseViewArgs(
+              exerciseName: 'Push Ups',
+              workout: workoutToAddTo,
+            ));
+          },
         )
         // Add more exercises here
       ],
@@ -144,13 +157,23 @@ Widget buildExerciseSelectorPage() => Scaffold(
   ),
 );
 
-// ----- Exercise Page -----
+// ----- Exercise View Page -----
+
+class ExerciseViewArgs {
+  String exerciseName;
+  Workout workout;
+
+  ExerciseViewArgs({
+    required this.exerciseName,
+    required this.workout,
+  });
+}
 
 // This view allows the user to add sets to this exercise (for todays workout), and also view historical data.
-Widget buildExercisePage(String exerciseName) => Scaffold(
+Widget buildExerciseViewPage(ExerciseViewArgs args) => Scaffold(
   appBar: AppBar(title: Text('Exercise Details')),
   body: Center(
-    child: Text('Exercise Main View Placeholder for $exerciseName'),
+    child: Text('Exercise Main View Placeholder for ${args.exerciseName} in ${args.workout.name}'),
   ),
 );
 

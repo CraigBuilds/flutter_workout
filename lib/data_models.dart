@@ -1,6 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 // ----- Data Models -----
 class Workout {
@@ -57,51 +55,4 @@ void addDummyWorkout(Workouts workouts, int index) {
   }
   newList[index] = newWorkout;
   workouts.value = newList;
-}
-
-// --- Persistence ---
-
-
-
-/// Loads workouts from shared preferences asynchronously.
-Future<Workouts> loadWorkoutsFromPrefs() async {
-  final prefs = await SharedPreferences.getInstance();
-  final contents = prefs.getString('workouts');
-  if (contents == null) {
-    return Workouts([]);
-  }
-  final List<dynamic> jsonList = jsonDecode(contents);
-  final workouts = jsonList.map((w) => Workout(
-    name: w['name'],
-    exercises: (w['exercises'] as List<dynamic>).map((e) => Exercise(
-      name: e['name'],
-      sets: (e['sets'] as List<dynamic>).map((s) => ExerciseSet(
-        reps: s['reps'],
-        weight: s['weight'].toDouble(),
-      )).toList(),
-    )).toList(),
-  )).toList();
-  return Workouts(workouts);
-}
-
-/// Saves workouts to shared preferences asynchronously.
-Future<void> saveWorkoutsToPrefs(Workouts workouts) async {
-  final prefs = await SharedPreferences.getInstance();
-  final jsonList = workouts.value.map((w) => w == null ? null : {
-    'name': w.name,
-    'exercises': w.exercises.map((e) => {
-      'name': e.name,
-      'sets': e.sets.map((s) => {
-        'reps': s.reps,
-        'weight': s.weight,
-      }).toList(),
-    }).toList(),
-  }).toList();
-  await prefs.setString('workouts', jsonEncode(jsonList));
-}
-
-/// reset preferences
-Future<void> resetWorkoutsPrefs() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.remove('workouts');
 }

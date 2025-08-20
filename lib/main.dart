@@ -3,8 +3,6 @@ import 'data_models.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // final workouts = await loadWorkoutsFromPrefs();
-  // workouts.addListener(() => saveWorkoutsToPrefs(workouts));
   final workouts = Workouts([]);
   runApp(buildApp(workouts));
 }
@@ -49,27 +47,29 @@ Widget buildWorkoutPane(Workouts workouts, int index) => Card(
       ListTile(
         title: Text(workouts.value[index]!.name),
       ),
-      Expanded(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              ...workouts.value[index]!.exercises
-                  .map((exercise) => buildExerciseTile(exercise)),
-              Card(
-                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                child: ListTile(
-                  leading: Icon(Icons.add),
-                  title: Text('Add Exercise'),
-                  onTap: () {
-                    // todo: add exercise to workout. This should navigate to exercise selector, and then exercise view
-                  },
-                ),
-              ),
-            ],
+      buildWorkoutPaneChildren(workouts, index),
+    ],
+  ),
+);
+
+Widget buildWorkoutPaneChildren(Workouts workouts, int index) => Expanded(
+  child: SingleChildScrollView(
+    child: Column(
+      children: [
+        ...workouts.value[index]!.exercises
+            .map((exercise) => buildExerciseTile(exercise)),
+        Card(
+          margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          child: ListTile(
+            leading: Icon(Icons.add),
+            title: Text('Add Exercise'),
+            onTap: () {
+              // todo: add exercise to workout. This should navigate to exercise selector, and then exercise view
+            },
           ),
         ),
-      ),
-    ],
+      ],
+    ),
   ),
 );
 

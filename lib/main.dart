@@ -4,19 +4,21 @@ import 'data_models.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final workouts = Workouts([]);
-  runApp(buildApp(workouts));
+  runApp(buildRoot(workouts));
 }
+
+// ----- Root -----
+
+Widget buildRoot(Workouts workouts) => ValueListenableBuilder<List<Workout?>>(
+  valueListenable: workouts,
+  builder: (_, workoutList, __) => buildApp(workouts, workoutList),
+);
 
 // ----- App -----
 
-Widget buildApp(Workouts workouts) => ValueListenableBuilder<List<Workout?>>(
-  valueListenable: workouts,
-  builder: (_, workoutList, __) {
-    return MaterialApp(
-      title: 'Functional Workout App',
-      home: buildHome(workouts, workoutList),
-    );
-  },
+Widget buildApp(Workouts workouts, List<Workout?> workoutList) => MaterialApp(
+  title: 'Functional Workout App',
+  home: buildHome(workouts, workoutList),
 );
 
 // ----- Home Page -----

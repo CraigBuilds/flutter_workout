@@ -22,14 +22,18 @@ class ExerciseSet {
   ExerciseSet({required this.reps, required this.weight});
 }
 
+class Context {
+  final ValueNotifier<List<Workout?>> workouts;
+
+  Context(this.workouts);
+}
+
 // ----- State -----
 
-/// Workouts is an alias for ValueNotifier`<List<Workout>>`, it notifies listeners when the list (immutable) is rebuilt
-typedef Workouts = ValueNotifier<List<Workout?>>;
 
-void addDummyWorkout(Workouts workouts, int index) {
+void addDummyWorkout(Context context, int index) {
   final newWorkout = Workout(
-    name: 'Workout ${workouts.value.length + 1}',
+    name: 'Workout ${context.workouts.value.length + 1}',
     exercises: [
       Exercise(
         name: 'Bench Press',
@@ -49,10 +53,10 @@ void addDummyWorkout(Workouts workouts, int index) {
 
   // Assign a new list to the ValueNotifier value. The newWorkout should be placed at the given index.
   // If the index is greater than the current length, pad with nulls (this is done by increasing the length)
-  final newList = List<Workout?>.from(workouts.value);
+  final newList = List<Workout?>.from(context.workouts.value);
   if (index >= newList.length) {
     newList.length = index + 1;
   }
   newList[index] = newWorkout;
-  workouts.value = newList;
+  context.workouts.value = newList;
 }

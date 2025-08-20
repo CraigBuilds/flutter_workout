@@ -3,62 +3,74 @@ import 'data_models.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final workouts = Workouts([]);
-  runApp(buildRoot(workouts));
+  final context = Context(ValueNotifier<List<Workout?>>([]));
+  runApp(buildRoot(context));
 }
 
 // ----- Root -----
 
-Widget buildRoot(Workouts workouts) => ValueListenableBuilder<List<Workout?>>(
-  valueListenable: workouts,
-  builder: (_, workoutList, __) => buildApp(workouts, workoutList),
+Widget buildRoot(Context context) => ValueListenableBuilder<List<Workout?>>(
+  valueListenable: context.workouts,
+  builder: (_, __, ___) => buildApp(context),
 );
 
 // ----- App -----
 
-Widget buildApp(Workouts workouts, List<Workout?> workoutList) => MaterialApp(
+//This is rebuilt by root whenever context.workouts changes
+Widget buildApp(Context context) => MaterialApp(
   title: 'Functional Workout App',
-  home: buildHome(workouts, workoutList),
+  home: buildHome(context),
+  routes: {
+    '/exercise_selector': (_) => buildExerciseSelector(),
+    '/about': (_) => buildAboutPage(),
+  },
 );
 
 // ----- Home Page -----
 
-Widget buildHome(Workouts workouts, List<Workout?> workoutList) => Scaffold(
+Widget buildHome(Context context) => Scaffold(
   appBar: AppBar(title: Text('Workouts')),
+  //PageView.builder is used to dynamically create pages for each workout
   body: PageView.builder(
     scrollDirection: Axis.horizontal,
     controller: PageController(viewportFraction: 0.95),
-    itemCount: workoutList.isEmpty ? 10 : workoutList.length + 10,
+    itemCount: context.workouts.value.isEmpty ? 10 : context.workouts.value.length + 10,
     itemBuilder: (_, i) {
-      if (i >= workoutList.length) {
-        return buildBlankPane(workouts, i);
+      if (i >= context.workouts.value.length) {
+        return buildBlankPane(context, i);
       }
-      if (workoutList[i] == null) {
-        return buildBlankPane(workouts, i);
+      if (context.workouts.value[i] == null) {
+        return buildBlankPane(context, i);
       }
-      return buildWorkoutPane(workouts, i);
+      return buildWorkoutPane(context, i);
     },
+  ),
+  floatingActionButton: Builder(
+    builder: (context) => FloatingActionButton(
+      onPressed: () => Navigator.of(context).pushNamed('/about'),
+      child: Icon(Icons.info),
+    ),
   ),
 );
 
 // ----- Workout Pane -----
 
-Widget buildWorkoutPane(Workouts workouts, int index) => Card(
+Widget buildWorkoutPane(Context context, int index) => Card(
   child: Column(
     children: [
       ListTile(
-        title: Text(workouts.value[index]!.name),
+        title: Text(context.workouts.value[index]!.name),
       ),
-      buildWorkoutPaneChildren(workouts, index),
+      buildWorkoutPaneChildren(context, index),
     ],
   ),
 );
 
-Widget buildWorkoutPaneChildren(Workouts workouts, int index) => Expanded(
+Widget buildWorkoutPaneChildren(Context context, int index) => Expanded(
   child: SingleChildScrollView(
     child: Column(
       children: [
-        ...workouts.value[index]!.exercises
+        ...context.workouts.value[index]!.exercises
             .map((exercise) => buildExerciseTile(exercise)),
         Card(
           margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -75,10 +87,10 @@ Widget buildWorkoutPaneChildren(Workouts workouts, int index) => Expanded(
   ),
 );
 
-Widget buildBlankPane(Workouts workouts, int index) => Card(
+Widget buildBlankPane(Context context, int index) => Card(
   child: Center(
     child: ElevatedButton(
-      onPressed: () => addDummyWorkout(workouts, index),
+      onPressed: () => addDummyWorkout(context, index),
       child: Text('Add Workout'),
     ),
   ),
@@ -98,4 +110,30 @@ Widget buildExerciseTile(Exercise exercise) => Card(
       }).toList(),
     ),
   ),
+);
+
+// ----- Exercise Selector -----
+
+// This widget allows users to select exercises from a tree structure. It is a new page in the app.
+Widget buildExerciseSelector() => Scaffold(
+  appBar: AppBar(title: Text('Select Exercise')),
+  body: Center(
+    child: Text('Exercise Selector Placeholder'),
+  ),
+);
+
+// ----- About Page -----
+
+Widget buildAboutPage() => Scaffold(
+  appBar: AppBar(title: Text('About')),
+  body: Center(
+    child: Padding(
+      padding: EdgeInsets.all(24),
+      child: Text(
+        'Functional Workout App\n\nVersion 1.0\n\nCreated for demonstration purposes.',
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 18),
+      ),
+    ),
+  )
 );

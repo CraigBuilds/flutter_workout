@@ -191,10 +191,7 @@ Widget buildExerciseViewPage(RouteArgs args) => Scaffold(
       final exercise = args.workout.exercises
           .firstWhere((e) => e.name == args.exerciseName);
       final set = exercise.sets[index];
-      return ListTile(
-        title: Text('Set ${index + 1}'),
-        subtitle: Text('${set.reps} reps @ ${set.weight} kg'),
-      );
+      return buildExerciseSetTile(index, set);
     },
   ),
   floatingActionButton: FloatingActionButton(
@@ -202,6 +199,60 @@ Widget buildExerciseViewPage(RouteArgs args) => Scaffold(
       addDummySetToExercise(args.appState, args.workout.name, args.exerciseName);
     },
     child: Icon(Icons.add),
+  ),
+);
+
+Widget buildExerciseSetTile(int index, ExerciseSet set) => Card(
+  child: ExpansionTile(
+    title: Text('Set ${index + 1}'),
+    subtitle: Text('${set.reps} reps @ ${set.weight} kg'), //todo add some icons to show extra info, e.g that partials were done. It does not need details here.
+    //details
+    children: [
+      ListTile(
+        title: Text('Reps'),
+        subtitle: Text('${set.reps}'),
+      ),
+      ListTile(
+        title: Text('Weight'),
+        subtitle: Text('${set.weight} kg'),
+      ),
+      ListTile(
+        title: Text('RIR'),
+        subtitle: Text('3'),
+      ),
+      ListTile(
+        title: Text('Partial reps (50%)'),
+        subtitle: Text('0'),
+      ),
+      ListTile(
+        title: Text('Partial reps (25%)'),
+        subtitle: Text('0'),
+      ),
+      ListTile(
+        title: Text('Drop reps (Drop 1)'),
+        subtitle: Text('0 reps at 0kg'),
+      ),
+      ListTile(
+        title: Text('Drop reps (Drop 2)'),
+        subtitle: Text('0 reps at 0kg'),
+      ),
+      ListTile(
+        title: Text('Drop reps (Drop 3)'),
+        subtitle: Text('0 reps at 0kg'),
+      ),
+      ListTile(
+        title: Text('Cheat reps'),
+        subtitle: Text('0'),
+      ),
+      ListTile(
+        title: Text('Myo reps'),
+        subtitle: Text('0'),
+      ),
+      ListTile(
+        title: Text('Overload Score'),
+        subtitle: Text('0'),
+      ),
+    ],
   ),
 );
 

@@ -1,4 +1,3 @@
-import 'package:app/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import '../backend.dart';
 import 'pages/about_page.dart';

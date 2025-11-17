@@ -189,7 +189,7 @@ Widget buildExerciseSetTile({
       children: [
         ElevatedButton(
           onPressed: () => openEditSetDialog(args, context, index),
-          child: const Text('Edit Set'),
+          child: Text('Edit Set ${index + 1}'),
         ),
         const Divider(),
         _buildDetailTile('Reps', '${set.reps}'),

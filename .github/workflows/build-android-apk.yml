@@ -5,6 +5,9 @@ on:
     branches:
       - main   # Run this workflow only on pushes to main
 
+permissions:
+  contents: write   # allow this workflow to create/update releases
+
 jobs:
   build-android:
     runs-on: ubuntu-latest #start with a clean Ubuntu environment
@@ -18,14 +21,24 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
+          cache: gradle #cache Gradle dependencies to speed up subsequent builds
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2 #use the v2 built-in action to set up Flutter
+        uses: subosito/flutter-action@v2 #use the v2 third-party action to set up Flutter
         with:
           channel: stable
+          cache: true #cache the Flutter SDK between runs to avoid re-downloading
 
-      - name: Generate Android project
-        run: flutter create . --platforms=android # Generates android/ (and other missing Android boilerplate) in the CI workspace. Existing lib/ and web/ contents are preserved.
+      - name: Generate Android project # Generates android and other missing Android boilerplate in the CI workspace. Existing lib/ and web/ contents are preserved.
+        run: flutter create . --platforms=android
+
+      - name: Cache pub packages
+        uses: actions/cache@v4 #cache Dart/Flutter pub packages
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: Flutter pub get
         run: flutter pub get # Get Flutter dependencies
@@ -40,3 +53,5 @@ jobs:
           name: Latest build
           artifacts: build/app/outputs/flutter-apk/app-release.apk
           token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true #allow updating the same "latest" release on each push
+          makeLatest: true   #mark this as the latest release

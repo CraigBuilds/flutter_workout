@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../backend.dart';
 import 'pages/about_page.dart';
 import 'pages/exercise_selector_page.dart';
-import 'pages/exercise_details_page.dart';
+import 'pages/set_logging_page.dart';
 
 class RouteArgs {
   AppState appState;
@@ -29,9 +29,9 @@ class MyRouter {
           return MaterialPageRoute(
             builder: (_) => buildExerciseSelectorPage(args),
           );
-        case '/exercise_details':
+        case '/set_logging':
           return MaterialPageRoute(
-            builder: (_) => buildExerciseDetailsPage(args),
+            builder: (_) => buildSetLoggingPage(args),
           );
       }
       return null;

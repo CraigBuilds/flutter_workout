@@ -15,7 +15,7 @@ Widget buildExerciseSelectorPage(RouteArgs args) => Scaffold(
             if (!args.workout.exercises.any((ex) => ex.name == 'Push Ups')) {
               createExerciseInWorkout(args.appState, args.workout.date, Exercise(name: 'Push Ups', sets: []));
             }
-            Navigator.of(context).pushNamed('/exercise_details', arguments: RouteArgs(
+            Navigator.of(context).pushNamed('/set_logging', arguments: RouteArgs(
               appState: args.appState,
               exerciseName: 'Push Ups',
               workout: args.workout,

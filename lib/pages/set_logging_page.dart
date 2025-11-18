@@ -3,7 +3,7 @@ import '../backend.dart';
 import '../my_router.dart';
 
 // This view allows the user to add sets to this exercise (for today's workout), and also view historical data.
-Widget buildExerciseDetailsPage(RouteArgs args) {
+Widget buildSetLoggingPage(RouteArgs args) {
   final exercise = _findExercise(args);
 
   return Builder(
@@ -161,13 +161,55 @@ Future<void> openNewSetDialog(BuildContext context, RouteArgs args) async {
 }
 
 void openEditSetDialog(RouteArgs args, BuildContext context, int setIndex) {
-  final updatedSet = ExerciseSet(reps: 12, weight: 60.0); // Placeholder for edited set
-  updateSetInExercise(
-    args.appState,
-    args.workout.date,
-    args.exerciseName,
-    setIndex,
-    updatedSet,
+  final exercise = _findExercise(args);
+  final set = exercise.sets[setIndex];
+
+  final repsController = TextEditingController(text: set.reps.toString());
+  final weightController = TextEditingController(text: set.weight.toString());
+
+  showDialog<ExerciseSet>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Edit Set'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildNumberField(
+            controller: repsController,
+            label: 'Reps',
+          ),
+          _buildNumberField(
+            controller: weightController,
+            label: 'Weight (kg)',
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final reps = int.tryParse(repsController.text) ?? set.reps;
+            final weight = double.tryParse(weightController.text) ?? set.weight;
+
+            Navigator.of(context).pop(
+              ExerciseSet(reps: reps, weight: weight),
+            );
+
+            updateSetInExercise(
+              args.appState,
+              args.workout.date,
+              args.exerciseName,
+              setIndex,
+              ExerciseSet(reps: reps, weight: weight),
+            );
+          },
+          child: const Text('Save Changes'),
+        ),
+      ],
+    ),
   );
 }
 
@@ -191,18 +233,23 @@ Widget buildExerciseSetTile({
           onPressed: () => openEditSetDialog(args, context, index),
           child: Text('Edit Set ${index + 1}'),
         ),
-        const Divider(),
-        _buildDetailTile('Reps', '${set.reps}'),
-        _buildDetailTile('Weight', '${set.weight} kg'),
-        _buildDetailTile('RIR', '3'),
-        _buildDetailTile('Partial reps (50%)', '0'),
-        _buildDetailTile('Partial reps (25%)', '0'),
-        _buildDetailTile('Drop reps (Drop 1)', '0 reps at 0kg'),
-        _buildDetailTile('Drop reps (Drop 2)', '0 reps at 0kg'),
-        _buildDetailTile('Drop reps (Drop 3)', '0 reps at 0kg'),
-        _buildDetailTile('Cheat reps', '0'),
-        _buildDetailTile('Myo reps', '0'),
-        _buildDetailTile('Overload Score', '0'),
+        ExpansionTile(
+          title: const Text('Show Extra Details'),
+          children: [
+            const Divider(),
+            _buildDetailTile('Reps', '${set.reps}'),
+            _buildDetailTile('Weight', '${set.weight} kg'),
+            _buildDetailTile('RIR', '3'),
+            _buildDetailTile('Partial reps (50%)', '0'),
+            _buildDetailTile('Partial reps (25%)', '0'),
+            _buildDetailTile('Drop reps (Drop 1)', '0 reps at 0kg'),
+            _buildDetailTile('Drop reps (Drop 2)', '0 reps at 0kg'),
+            _buildDetailTile('Drop reps (Drop 3)', '0 reps at 0kg'),
+            _buildDetailTile('Cheat reps', '0'),
+            _buildDetailTile('Myo reps', '0'),
+            _buildDetailTile('Overload Score', '0'),
+          ],
+        ),
       ],
     ),
   );

@@ -89,7 +89,7 @@ Widget buildExerciseTile(AppState appState, Exercise exercise, Workout workout) 
         }).toList(),
       ),
       onTap: () {
-        Navigator.of(context).pushNamed('/exercise_details', arguments: RouteArgs(
+        Navigator.of(context).pushNamed('/set_logging', arguments: RouteArgs(
           appState: appState,
           exerciseName: exercise.name,
           workout: workout,

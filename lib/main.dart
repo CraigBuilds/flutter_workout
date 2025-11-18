@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 import 'backend.dart';
 import 'pages/home_page.dart';
 import 'my_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final appState = AppState(ValueNotifier<Map<Date, Workout>>({}));
+  await Hive.initFlutter(); // Initializes Hive for Flutter
+  Hive.registerAdapter(DateAdapter());
+  Hive.registerAdapter(WorkoutAdapter());
+  Hive.registerAdapter(ExerciseAdapter());
+  Hive.registerAdapter(ExerciseSetAdapter());
+  final database = await Hive.openBox<Workout>('workout_database'); // Creates if missing
+  final appState = AppState.fromHiveBox(database);
   runApp(root(appState));
 }
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../backend.dart';
+import 'backend.dart';
 import 'pages/about_page.dart';
 import 'pages/exercise_selector_page.dart';
 import 'pages/set_logging_page.dart';

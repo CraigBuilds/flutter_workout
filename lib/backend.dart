@@ -1,9 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'dart:collection'; //for UnmodifiableMapView
+import 'package:hive/hive.dart'; //for decorators and Box class
+part 'backend.g.dart';
 
+@HiveType(typeId: 0)
 class Date {
+  @HiveField(0)
   final int year;
+  @HiveField(1)
   final int month;
+  @HiveField(2)
   final int day;
 
   const Date(this.year, this.month, this.day);
@@ -33,28 +39,47 @@ class Date {
   String toString() {
     return '$year-$month-$day';
   }
+
+  factory Date.fromString(String value) {
+    final parts = value.split('-');
+    return Date(
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+      int.parse(parts[2]),
+    );
+  }
 }
 
 // ----- Data Models -----
+@HiveType(typeId: 1)
 class Workout {
+  @HiveField(0)
   final Date date;
+  @HiveField(1)
   final List<Exercise> exercises;
 
   Workout({required this.date, required this.exercises});
 }
-
+@HiveType(typeId: 2)
 class Exercise {
+  @HiveField(0)
   final String name;
+  @HiveField(1)
   final List<ExerciseSet> sets;
   Exercise({required this.name, required this.sets});
 }
 
+@HiveType(typeId: 3)
 class ExerciseSet {
+  @HiveField(0)
   final int reps;
+  @HiveField(1)
   final double weight;
 
   ExerciseSet({required this.reps, required this.weight});
 }
+
+// ----- Main App State (wrapped map of Date->Workout in a ValueNotifier) -----
 
 class AppState {
 
@@ -62,9 +87,33 @@ class AppState {
 
   AppState(this._workouts);
 
+  factory AppState.fromHiveBox(Box<Workout> database) {
+    final loadedWorkouts = <Date, Workout>{};
+    for (var key in database.keys) {
+      final workout = database.get(key)!;           // Workout
+      final date = Date.fromString(key as String);  // convert key to Date
+      loadedWorkouts[date] = workout;
+    }
+    return AppState(ValueNotifier<Map<Date, Workout>>(loadedWorkouts));
+  }
+
   UnmodifiableMapView<Date, Workout> get workouts => UnmodifiableMapView(_workouts.value);
 
   set workouts(Map<Date, Workout> newWorkouts) {
+    final box = Hive.box<Workout>('workout_database');
+
+    // Clear deleted entries from the database (optional but recommended)
+    final currentKeys = box.keys.toSet();
+    final newKeys = newWorkouts.keys.map((d) => d.toString()).toSet();
+    final removedKeys = currentKeys.difference(newKeys);
+    box.deleteAll(removedKeys);
+
+    // Write/update all workouts
+    for (var entry in newWorkouts.entries) {
+      final key = entry.key.toString(); // "yyyy-mm-dd"
+      box.put(key, entry.value);
+    }
+
     _workouts.value = Map<Date, Workout>.from(newWorkouts);
   }
 

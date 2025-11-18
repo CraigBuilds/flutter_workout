@@ -6,5 +6,5 @@
 
 
 ```
-flutter run -d chrome --web-renderer=html --release
+flutter run -d chrome --release
 ```

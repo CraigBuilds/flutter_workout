@@ -3,37 +3,38 @@ name: Build Android APK
 on:
   push:
     branches:
-      - main
+      - main   # Run this workflow only on pushes to main
 
 jobs:
   build-android:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest #start with a clean Ubuntu environment
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 #use the v4 built-in action to checkout the repository
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v4 #use the v4 built-in action to set up Java (version 17 is required for Flutter Android builds)
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@v2 #use the v2 built-in action to set up Flutter
         with:
           channel: stable
-          # Optionally pin a version:
-          # flutter-version: "3.24.0"
+
+      - name: Generate Android project
+        run: flutter create . --platforms=android # Generates android/ (and other missing Android boilerplate) in the CI workspace. Existing lib/ and web/ contents are preserved.
 
       - name: Flutter pub get
-        run: flutter pub get
+        run: flutter pub get # Get Flutter dependencies
 
       - name: Build release APK
-        run: flutter build apk --release
+        run: flutter build apk --release # Build the release APK
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4 # Upload the generated APK as an artifact
         with:
           name: app-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk

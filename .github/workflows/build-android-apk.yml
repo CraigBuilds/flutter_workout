@@ -16,6 +16,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4 #use the v4 built-in action to checkout the repository
 
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2 #use the v2 third-party action to set up Flutter
+        with:
+          channel: stable
+          cache: true #cache the Flutter SDK between runs to avoid re-downloading
+
       - name: Generate Android project # Generates android and other missing Android boilerplate in the CI workspace. Existing lib/ and web/ contents are preserved.
         run: flutter create . --platforms=android
 
@@ -25,12 +31,6 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: gradle #cache Gradle dependencies to speed up subsequent builds
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2 #use the v2 third-party action to set up Flutter
-        with:
-          channel: stable
-          cache: true #cache the Flutter SDK between runs to avoid re-downloading
 
       - name: Cache pub packages
         uses: actions/cache@v4 #cache Dart/Flutter pub packages

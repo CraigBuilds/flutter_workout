@@ -6,7 +6,7 @@
 
 ```
 flutter pub run build_runner build --delete-conflicting-outputs # generate code (type adapters for NoSQL database)
-flutter run -d chrome --release
+flutter run -d chrome --release --web-port 8080
 ```
 
 # Releases

@@ -6,12 +6,12 @@ import 'my_router.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final appState = AppState(ValueNotifier<Map<Date, Workout>>({}));
-  runApp(MyApp(appState));
+  runApp(root(appState));
 }
 
 // ----- Root (The main Widget)-----
 
-Widget MyApp(AppState appState) => ValueListenableBuilder<Map<Date, Workout>>(
+Widget root(AppState appState) => ValueListenableBuilder<Map<Date, Workout>>(
   valueListenable: appState.workoutsNotifier,
   builder: (_, __, ___) => buildApp(appState), //this function is called whenever appState.workouts changes
 );

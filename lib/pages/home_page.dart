@@ -3,7 +3,16 @@ import '../backend.dart';
 import '../my_router.dart';
 
 Widget buildHome(AppState appState) => Scaffold(
-  appBar: AppBar(title: Text('Workouts')),
+  appBar: AppBar(
+    title: Text('Workouts'),
+    actions: [
+      Builder(builder: (context) => IconButton(
+        icon: Icon(Icons.settings),
+        onPressed: () {Navigator.pushNamed(context, '/settings');},
+      ),
+      ),
+    ],
+  ),
   //PageView.builder is used to dynamically create pages for each workout
   body: PageView.builder(
     scrollDirection: Axis.horizontal,

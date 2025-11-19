@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'backend.dart';
+part of 'models.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator

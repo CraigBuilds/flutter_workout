@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'dart:collection'; //for UnmodifiableMapView
 import 'package:hive/hive.dart'; //for decorators and Box class
-part 'backend.g.dart';
+part 'models.g.dart';
 
 @HiveType(typeId: 0)
 class Date {

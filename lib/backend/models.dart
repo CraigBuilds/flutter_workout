@@ -49,6 +49,18 @@ class ExerciseSet {
   @HiveField(3)
   final double weight;
 
+  @HiveField(4)
+  final bool completed = false;
+
+  @HiveField(5)
+  final int partialReps = 0;
+
+  @HiveField(6)
+  final int restMinutes = 0;
+
+  @HiveField(7)
+  final int rir = 0;
+
   Exercise get parent {
     final box = Hive.box<Workout>('workout_database');
     final workout = box.get(date.toString())!;

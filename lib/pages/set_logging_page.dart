@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../backend/models.dart';
-import '../backend/crud.dart' as crud;
 import '../backend/app_state.dart';
 
 // This view allows the user to add sets to this exercise (for today's workout), and also view historical data.
@@ -136,8 +135,7 @@ Future openEditSetDialog(BuildContext context, AppState appState, ExerciseSet se
   initialReps: set.reps.toString(),
   initialWeight: set.weight.toString(),
   onSubmit: (reps, weight) {
-    crud.updateSetInExercise(
-      appState,
+    appState.updateSetInExercise(
       set.parent.parent.date,
       set.parent.name,
       set.parent.sets.indexOf(set),
@@ -153,8 +151,7 @@ Future openAddNewSetDialog(BuildContext context, AppState appState, Exercise sel
   initialReps: '',
   initialWeight: '',
   onSubmit: (reps, weight) {
-    crud.createSetInExercise(
-      appState,
+    appState.createSetInExercise(
       selectedExercise.parent.date,
       selectedExercise.name,
       ExerciseSet(reps: reps, weight: weight, date: selectedExercise.parent.date, exerciseName: selectedExercise.name),
@@ -199,8 +196,7 @@ Future openExerciseSetLongPressContextMenu(BuildContext context, AppState appSta
   );
 
   if (result == 'delete') {
-    crud.deleteSetFromExercise(
-      appState,
+    appState.deleteSetFromExercise(
       set.parent.parent.date,
       set.parent.name,
       set.parent.sets.indexOf(set),

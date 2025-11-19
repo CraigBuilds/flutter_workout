@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../backend/app_state.dart';
-import '../backend/crud.dart' as crud;
 
 Widget buildSettingsPage(BuildContext context, AppState appState) => Scaffold(
   body: buildSettingsBody(context, appState),
@@ -46,7 +45,7 @@ Widget buildSettingsBody(BuildContext context, AppState appState) => ListView(
               TextButton(
                 child: Text('Delete', style: TextStyle(color: Colors.red)),
                 onPressed: () {
-                  crud.deleteAllData(appState);
+                  appState.deleteAllData();
                   Navigator.of(context).pop();
                 },
               ),

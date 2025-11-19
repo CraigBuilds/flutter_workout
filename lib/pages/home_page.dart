@@ -1,7 +1,6 @@
 import 'package:app/pages/exercise_selector_page.dart';
 import 'package:flutter/material.dart';
 import '../backend/models.dart';
-import '../backend/crud.dart' as crud;
 import '../backend/app_state.dart';
 import 'settings_page.dart';
 import 'set_logging_page.dart';
@@ -173,8 +172,8 @@ Future handleAddExerciseToNewWorkoutButtonTap(AppState appState, BuildContext co
   bool workoutExistsForToday = appState.workouts.containsKey(today);
   Workout selectedWorkout;
   if (!workoutExistsForToday) {
-    crud.createEmptyWorkout(appState, today);
-    selectedWorkout = crud.readWorkout(appState, today);
+    appState.createEmptyWorkout(today);
+    selectedWorkout = appState.readWorkout(today);
     navigateToAddExercise(selectedWorkout);
   }
   else {
@@ -189,9 +188,9 @@ Future handleAddExerciseToNewWorkoutButtonTap(AppState appState, BuildContext co
     }
     //check if workout exists for selected date, if not create it
     if (!appState.workouts.containsKey(selectedDate)) {
-      crud.createEmptyWorkout(appState, selectedDate);
+      appState.createEmptyWorkout(selectedDate);
     }
-    selectedWorkout = crud.readWorkout(appState, selectedDate);
+    selectedWorkout = appState.readWorkout(selectedDate);
     navigateToAddExercise(selectedWorkout);
   }
 }
@@ -243,6 +242,6 @@ Future handleExerciseTileLongPress(AppState appState, Exercise exercise, Workout
   );
 
   if (result == 'delete') {
-    crud.deleteExerciseFromWorkout(appState, workout.date, exercise.name);
+    appState.deleteExerciseFromWorkout(workout.date, exercise.name);
   }
 }

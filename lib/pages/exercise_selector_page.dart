@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../backend/app_state.dart';
 import '../backend/models.dart';
-import '../backend/crud.dart';
 import 'set_logging_page.dart';
 
 //ToDo:
@@ -48,8 +47,7 @@ Widget _buildExerciseTile(BuildContext context, AppState appState, Workout selec
   title: Text(exerciseName),
   onTap: () {
     if (!selectedWorkout.exercises.any((ex) => ex.name == exerciseName)) {
-      createExerciseInWorkout(
-        appState,
+      appState.createExerciseInWorkout(
         selectedWorkout.date,
         Exercise(name: exerciseName, sets: [], date: selectedWorkout.date),
       );

@@ -4,7 +4,7 @@ import '../backend/my_router.dart';
 import '../backend/crud.dart';
 import '../backend/app_state.dart';
 
-Widget buildHome(AppState appState) => Scaffold(
+Widget buildHome(AppState appState, BuildContext context) => Scaffold(
   appBar: AppBar(
     title: Text('Workouts'),
     actions: [

@@ -5,7 +5,7 @@ import '../backend/crud.dart';
 import '../backend/app_state.dart';
 
 // This view allows the user to add sets to this exercise (for today's workout), and also view historical data.
-Widget buildSetLoggingPage(RouteArgs args) {
+Widget buildSetLoggingPage(RouteArgs args, BuildContext context) {
   final exercise = _findExercise(args);
 
   return Builder(

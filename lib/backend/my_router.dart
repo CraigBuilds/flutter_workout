@@ -22,19 +22,18 @@ class MyRouter {
     '/about': (_) => buildAboutPage(),
   };
 
-  static Route<dynamic>? Function(RouteSettings)? onGenerateRoute =
-  (settings) {
-      final RouteArgs args = settings.arguments as RouteArgs;
-      switch (settings.name) {
-        case '/exercise_selector':
-          return MaterialPageRoute(
-            builder: (_) => buildExerciseSelectorPage(args),
-          );
-        case '/set_logging':
-          return MaterialPageRoute(
-            builder: (_) => buildSetLoggingPage(args),
-          );
-      }
-      return null;
-    };
+  static Route<dynamic>? Function(RouteSettings)? onGenerateRoute = (settings) {
+    final RouteArgs args = settings.arguments as RouteArgs;
+    switch (settings.name) {
+      case '/exercise_selector':
+        return MaterialPageRoute(
+          builder: (context) => buildExerciseSelectorPage(args, context),
+        );
+      case '/set_logging':
+        return MaterialPageRoute(
+          builder: (context) => buildSetLoggingPage(args, context),
+        );
+    }
+    return null;
+  };
 }

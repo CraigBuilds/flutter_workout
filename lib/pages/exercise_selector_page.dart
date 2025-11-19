@@ -4,7 +4,7 @@ import '../backend/my_router.dart';
 import '../backend/crud.dart';
 
 // This view allows users to select exercises from a tree structure. It is a new page in the app.
-Widget buildExerciseSelectorPage(RouteArgs args) => Scaffold(
+Widget buildExerciseSelectorPage(RouteArgs args, BuildContext context) => Scaffold(
   appBar: AppBar(title: Text('Select Exercise')),
   body: Builder(
     builder: (context) => ListView(

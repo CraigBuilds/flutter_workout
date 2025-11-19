@@ -21,15 +21,15 @@ void main() async {
 
 Widget root(AppState appState) => ValueListenableBuilder<Map<Date, Workout>>(
   valueListenable: appState.workoutsNotifier,
-  builder: (_, __, ___) => buildApp(appState), //this function is called whenever appState.workouts changes
+  builder: (context, __, ___) => buildApp(appState, context), //this function is called whenever appState.workouts changes
 );
 
 // ----- App -----
 
 //This is rebuilt by root whenever appState.workouts changes
-Widget buildApp(AppState appState) => MaterialApp(
+Widget buildApp(AppState appState, BuildContext context) => MaterialApp(
   title: 'Functional Workout App',
-  home: buildHome(appState),
+  home: buildHome(appState, context),
   routes: MyRouter.routes,
   onGenerateRoute: MyRouter.onGenerateRoute,
 );

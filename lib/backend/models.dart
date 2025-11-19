@@ -3,8 +3,10 @@ part 'models.g.dart';
 
 @HiveType(typeId: 1)
 class Workout {
+
   @HiveField(0)
   final Date date;
+
   @HiveField(1)
   final List<Exercise> exercises;
 
@@ -12,29 +14,59 @@ class Workout {
 }
 @HiveType(typeId: 2)
 class Exercise {
+
   @HiveField(0)
-  final String name;
+  final Date date;
+
   @HiveField(1)
+  final String name;
+
+  @HiveField(2)
   final List<ExerciseSet> sets;
-  Exercise({required this.name, required this.sets});
+
+  String get id => '${date.toString()}_$name';
+
+  Workout get parent {
+    final box = Hive.box<Workout>('workout_database');
+    return box.get(date.toString())!;
+  }
+
+  Exercise({required this.name, required this.sets, required this.date});
 }
 
 @HiveType(typeId: 3)
 class ExerciseSet {
+
   @HiveField(0)
-  final int reps;
+  final Date date;
+
   @HiveField(1)
+  final String exerciseName;
+
+  @HiveField(2)
+  final int reps;
+
+  @HiveField(3)
   final double weight;
 
-  ExerciseSet({required this.reps, required this.weight});
+  Exercise get parent {
+    final box = Hive.box<Workout>('workout_database');
+    final workout = box.get(date.toString())!;
+    return workout.exercises.firstWhere((ex) => ex.name == exerciseName);
+  }
+
+  ExerciseSet({required this.reps, required this.weight, required this.date, required this.exerciseName});
 }
 
 @HiveType(typeId: 0)
 class Date {
+
   @HiveField(0)
   final int year;
+
   @HiveField(1)
   final int month;
+
   @HiveField(2)
   final int day;
 
@@ -75,9 +107,3 @@ class Date {
     );
   }
 }
-
-// ----- Main App State (wrapped map of Date->Workout in a ValueNotifier) -----
-
-
-// ----- CRUD Operations for AppState -----
-

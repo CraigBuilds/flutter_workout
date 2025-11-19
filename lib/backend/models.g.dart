@@ -54,18 +54,21 @@ class ExerciseAdapter extends TypeAdapter<Exercise> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Exercise(
-      name: fields[0] as String,
-      sets: (fields[1] as List).cast<ExerciseSet>(),
+      name: fields[1] as String,
+      sets: (fields[2] as List).cast<ExerciseSet>(),
+      date: fields[0] as Date,
     );
   }
 
   @override
   void write(BinaryWriter writer, Exercise obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.name)
+      ..write(obj.date)
       ..writeByte(1)
+      ..write(obj.name)
+      ..writeByte(2)
       ..write(obj.sets);
   }
 
@@ -91,18 +94,24 @@ class ExerciseSetAdapter extends TypeAdapter<ExerciseSet> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ExerciseSet(
-      reps: fields[0] as int,
-      weight: fields[1] as double,
+      reps: fields[2] as int,
+      weight: fields[3] as double,
+      date: fields[0] as Date,
+      exerciseName: fields[1] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, ExerciseSet obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4)
       ..writeByte(0)
-      ..write(obj.reps)
+      ..write(obj.date)
       ..writeByte(1)
+      ..write(obj.exerciseName)
+      ..writeByte(2)
+      ..write(obj.reps)
+      ..writeByte(3)
       ..write(obj.weight);
   }
 

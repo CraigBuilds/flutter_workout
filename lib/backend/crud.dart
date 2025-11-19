@@ -89,3 +89,9 @@ void deleteSetFromExercise(AppState appState, Date workoutDate, String exerciseN
     appState.workouts = dataCopy;
   }
 }
+
+// Delete all data
+
+void deleteAllData(AppState appState) {
+  appState.workouts = {};
+}

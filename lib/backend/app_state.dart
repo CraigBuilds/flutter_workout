@@ -11,9 +11,10 @@ class AppState {
 
   factory AppState.fromHiveBox(Box<Workout> database) {
     final loadedWorkouts = <Date, Workout>{};
+    //load all workouts from the database
     for (var key in database.keys) {
-      final workout = database.get(key)!;           // Workout
-      final date = Date.fromString(key as String);  // convert key to Date
+      final workout = database.get(key)!;
+      final date = Date.fromString(key as String);
       loadedWorkouts[date] = workout;
     }
     return AppState(ValueNotifier<Map<Date, Workout>>(loadedWorkouts));
@@ -25,12 +26,12 @@ class AppState {
     final box = Hive.box<Workout>('workout_database');
 
     // Clear deleted entries from the database (optional but recommended)
-    final currentKeys = box.keys.toSet();
-    final newKeys = newWorkouts.keys.map((d) => d.toString()).toSet();
-    final removedKeys = currentKeys.difference(newKeys);
-    box.deleteAll(removedKeys);
+    // final currentKeys = box.keys.toSet();
+    // final newKeys = newWorkouts.keys.map((d) => d.toString()).toSet();
+    // final removedKeys = currentKeys.difference(newKeys);
+    // box.deleteAll(removedKeys);
 
-    // Write/update all workouts
+    // save all workouts to the database
     for (var entry in newWorkouts.entries) {
       final key = entry.key.toString(); // "yyyy-mm-dd"
       box.put(key, entry.value);

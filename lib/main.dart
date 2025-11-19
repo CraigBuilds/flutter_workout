@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'backend/models.dart';
 import 'pages/home_page.dart';
-import 'backend/my_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'backend/app_state.dart';
 
@@ -21,15 +20,15 @@ void main() async {
 
 Widget root(AppState appState) => ValueListenableBuilder<Map<Date, Workout>>(
   valueListenable: appState.workoutsNotifier,
-  builder: (context, __, ___) => buildApp(appState, context), //this function is called whenever appState.workouts changes
+  builder: (_, __, ___) => buildApp(appState), //this function is called whenever appState.workouts changes
 );
 
 // ----- App -----
 
 //This is rebuilt by root whenever appState.workouts changes
-Widget buildApp(AppState appState, BuildContext context) => MaterialApp(
+Widget buildApp(AppState appState) => MaterialApp(
   title: 'Functional Workout App',
-  home: buildHome(appState, context),
-  routes: MyRouter.routes,
-  onGenerateRoute: MyRouter.onGenerateRoute,
+  home: Builder(
+    builder: (context) => buildHome(appState, context), // this context is under MaterialApp
+  ),
 );

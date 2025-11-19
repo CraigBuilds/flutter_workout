@@ -18,12 +18,51 @@ Widget buildHome(AppState appState, BuildContext context) => Scaffold(
 PreferredSizeWidget buildHomeAppBar(AppState appState, BuildContext context) => AppBar(
   title: Text('Workouts'),
   actions: [
-    IconButton(
-      icon: Icon(Icons.settings),
-      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => buildSettingsPage(context, appState)),),
-    ),
-  ],
+    buildAppBarMenuButton(appState, context)
+  ]
 );
+
+Widget buildAppBarMenuButton(AppState appState, BuildContext context) => IconButton(
+  icon: Icon(Icons.more_vert),
+  onPressed: () => handleAppBarMenuButtonPressed(appState, context)
+);
+
+Future<void> handleAppBarMenuButtonPressed(AppState appState, BuildContext context) async {
+  final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+  final navigator = Navigator.of(context);
+  final result = await showMenu<String>(
+    context: context,
+    position: RelativeRect.fromLTRB(
+      overlay.size.width,
+      kToolbarHeight,
+      0,
+      0,
+    ),
+    items: buildAppBarMenuItems(),
+  );
+  if (result == 'settings') {
+    navigator.push(MaterialPageRoute(builder: (_) => buildSettingsPage(context, appState)),);
+  }
+}
+
+List<PopupMenuEntry<String>> buildAppBarMenuItems() => [
+  for (var item in [
+    ['settings', Icons.settings, 'Settings'],
+    ['createRoutine', Icons.create, 'Create Workout Routine'],
+    ['browseRoutines', Icons.search, 'Browse Workout Routines'],
+    ['cancel', Icons.cancel, 'Cancel'],
+  ])
+    PopupMenuItem<String>(
+      value: item[0] as String,
+      child: Row(
+        children: [
+          Icon(item[1] as IconData, size: 20),
+          SizedBox(width: 8),
+          Text(item[2] as String),
+        ],
+      ),
+    ),
+];
 
 Widget buildHomeBody(AppState appState, BuildContext context) => PageView.builder(
   scrollDirection: Axis.horizontal,

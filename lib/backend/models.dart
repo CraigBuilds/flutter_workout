@@ -77,11 +77,6 @@ class Date {
       return Date(now.year, now.month, now.day);
   }
 
-  factory Date.tomorrow() {
-      final tomorrow = DateTime.now().add(Duration(days: 1));
-      return Date(tomorrow.year, tomorrow.month, tomorrow.day);
-  }
-
   @override
   bool operator == (Object other) {
       return (other is Date &&

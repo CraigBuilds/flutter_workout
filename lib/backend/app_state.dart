@@ -26,10 +26,10 @@ class AppState {
     final box = Hive.box<Workout>('workout_database');
 
     // Clear deleted entries from the database (optional but recommended)
-    // final currentKeys = box.keys.toSet();
-    // final newKeys = newWorkouts.keys.map((d) => d.toString()).toSet();
-    // final removedKeys = currentKeys.difference(newKeys);
-    // box.deleteAll(removedKeys);
+    final currentKeys = box.keys.toSet();
+    final newKeys = newWorkouts.keys.map((d) => d.toString()).toSet();
+    final removedKeys = currentKeys.difference(newKeys);
+    box.deleteAll(removedKeys);
 
     // save all workouts to the database
     for (var entry in newWorkouts.entries) {

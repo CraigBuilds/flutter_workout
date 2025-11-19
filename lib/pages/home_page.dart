@@ -1,7 +1,7 @@
 import 'package:app/pages/exercise_selector_page.dart';
 import 'package:flutter/material.dart';
 import '../backend/models.dart';
-import '../backend/crud.dart';
+import '../backend/crud.dart' as crud;
 import '../backend/app_state.dart';
 import 'settings_page.dart';
 import 'set_logging_page.dart';
@@ -28,7 +28,7 @@ PreferredSizeWidget buildHomeAppBar(AppState appState, BuildContext context) => 
 Widget buildHomeBody(AppState appState, BuildContext context) => PageView.builder(
   scrollDirection: Axis.horizontal,
   controller: PageController(viewportFraction: 0.95),
-  itemCount: appState.workouts.length + 1,
+  itemCount: appState.workouts.length + 1, // +1 for "Plan New Workout" pane
   itemBuilder: (_, i) => buildWorkoutPane(
     appState,
     appState.workouts.values.elementAtOrNull(i),
@@ -70,24 +70,52 @@ Widget buildAddExerciseButton(AppState appState, Workout? workout, BuildContext 
   child: ListTile(
     leading: Icon(Icons.add),
     title: Text('Add Exercise'),
-    onTap: () => handleAddExerciseButtonTap(appState, workout, context),
+    onTap: () => {
+      if (workout != null) {
+        handleAddExerciseToExistingWorkoutButtonTap(appState, workout, context)
+      }
+      else {
+        handleAddExerciseToNewWorkoutButtonTap(appState, context)
+      }
+    }
   ),
 );
 
-void handleAddExerciseButtonTap(AppState appState, Workout? workout, BuildContext context) {
-  Workout? targetWorkout = workout;
-  if (targetWorkout == null) {
-    final today = Date.today();
-    if (!appState.workouts.containsKey(today)) {
-      createEmptyWorkout(appState, today);
-      targetWorkout = readWorkout(appState, today);
-    }else {
-      final tomorrow = Date.tomorrow();
-      createEmptyWorkout(appState, tomorrow);
-      targetWorkout = readWorkout(appState, tomorrow);
-    }
+void handleAddExerciseToExistingWorkoutButtonTap(AppState appState, Workout selectedWorkout, BuildContext context) {
+  Navigator.push(context, MaterialPageRoute(builder: (_) => buildExerciseSelectorPage(context, appState, selectedWorkout)),);
+}
+
+Future handleAddExerciseToNewWorkoutButtonTap(AppState appState, BuildContext context) async {
+  // Store a callback that uses BuildContext before the async gap
+  void navigateToAddExercise(Workout selectedWorkout) {
+    handleAddExerciseToExistingWorkoutButtonTap(appState, selectedWorkout, context);
   }
-  Navigator.push(context, MaterialPageRoute(builder: (_) => buildExerciseSelectorPage(context, appState, targetWorkout!)),);
+
+  Date today = Date.today();
+  bool workoutExistsForToday = appState.workouts.containsKey(today);
+  Workout selectedWorkout;
+  if (!workoutExistsForToday) {
+    crud.createEmptyWorkout(appState, today);
+    selectedWorkout = crud.readWorkout(appState, today);
+    navigateToAddExercise(selectedWorkout);
+  }
+  else {
+    Date? selectedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(Duration(days: 365)),
+    ).then((dateTime) => dateTime != null ? Date(dateTime.year, dateTime.month, dateTime.day) : null);
+    if (selectedDate == null) {
+      return; //user cancelled date picker
+    }
+    //check if workout exists for selected date, if not create it
+    if (!appState.workouts.containsKey(selectedDate)) {
+      crud.createEmptyWorkout(appState, selectedDate);
+    }
+    selectedWorkout = crud.readWorkout(appState, selectedDate);
+    navigateToAddExercise(selectedWorkout);
+  }
 }
 
 // ----- Exercise Tile -----

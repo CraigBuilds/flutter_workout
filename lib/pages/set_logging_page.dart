@@ -172,5 +172,38 @@ Widget buildExerciseSetTile(BuildContext context, AppState appState, ExerciseSet
     onTap: () {
       openEditSetDialog(context, appState, set);
     },
+    onLongPress: () => openExerciseSetLongPressContextMenu(context, appState, set),
   ),
 );
+
+Future openExerciseSetLongPressContextMenu(BuildContext context, AppState appState, ExerciseSet set) async {
+  final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+  final result = await showMenu<String>(
+    context: context,
+    position: RelativeRect.fromLTRB(
+      overlay.size.width / 2,
+      overlay.size.height / 2,
+      overlay.size.width / 2,
+      overlay.size.height / 2,
+    ),
+    items: [
+      PopupMenuItem<String>(
+        value: 'delete',
+        child: Text('Delete Set'),
+      ),
+      PopupMenuItem<String>(
+        value: 'cancel',
+        child: Text('Cancel'),
+      ),
+    ],
+  );
+
+  if (result == 'delete') {
+    crud.deleteSetFromExercise(
+      appState,
+      set.parent.parent.date,
+      set.parent.name,
+      set.parent.sets.indexOf(set),
+    );
+  }
+}

@@ -4,6 +4,13 @@ import '../backend/models.dart';
 import '../backend/crud.dart';
 import 'set_logging_page.dart';
 
+//ToDo:
+// - Exercise list should come from database
+// - Organize exercises by muscle group (e.g chest, back, legs, arms, shoulders, core)
+// - Option to organize exercises by movement type instead (e.g push, pull, legs, etc.)
+// - Search bar to filter exercises by name
+// - Option to add custom exercises
+
 Widget buildExerciseSelectorPage(BuildContext context, AppState appState, Workout selectedWorkout) => Scaffold(
   appBar: AppBar(title: Text('Select Exercise')),
   body: ListView(

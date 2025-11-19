@@ -165,7 +165,8 @@ Widget buildExerciseTile(AppState appState, Exercise exercise, Workout workout, 
   child: ListTile(
     title: Text(exercise.name),
     subtitle: buildExerciseSets(exercise),
-    onTap: () => handleExerciseTileTap(appState, exercise, workout, context)
+    onTap: () => handleExerciseTileTap(appState, exercise, workout, context),
+    onLongPress: () => handleExerciseTileLongPress(appState, exercise, workout, context),
   ),
 );
 
@@ -178,4 +179,31 @@ Widget buildExerciseSets(Exercise exercise) => Column(
 
 void handleExerciseTileTap(AppState appState, Exercise exercise, Workout workout, BuildContext context) {
   Navigator.push(context, MaterialPageRoute(builder: (_) => buildSetLoggingPage(context, appState, exercise)),);
+}
+
+Future handleExerciseTileLongPress(AppState appState, Exercise exercise, Workout workout, BuildContext context) async {
+  final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+  final result = await showMenu<String>(
+    context: context,
+    position: RelativeRect.fromLTRB(
+      overlay.size.width / 2,
+      overlay.size.height / 2,
+      overlay.size.width / 2,
+      overlay.size.height / 2,
+    ),
+    items: [
+      PopupMenuItem<String>(
+        value: 'delete',
+        child: Text('Delete Exercise'),
+      ),
+      PopupMenuItem<String>(
+        value: 'cancel',
+        child: Text('Cancel'),
+      ),
+    ],
+  );
+
+  if (result == 'delete') {
+    crud.deleteExerciseFromWorkout(appState, workout.date, exercise.name);
+  }
 }

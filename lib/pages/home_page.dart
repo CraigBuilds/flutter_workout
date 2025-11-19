@@ -41,15 +41,39 @@ Widget buildHomeBody(AppState appState, BuildContext context) => PageView.builde
 Widget buildWorkoutPane(AppState appState, Workout? workout, BuildContext context) => Card(
   child: Column(
     children: [
-      buildWorkoutPaneHeader(workout),
+      buildWorkoutPaneHeader(workout, appState),
       buildWorkoutPaneContent(appState, workout, context),
     ],
   ),
 );
 
-Widget buildWorkoutPaneHeader(Workout? workout) => ListTile(
-  title: Text(workout?.date.toString() ?? 'Add New Workout'),
-);
+Widget buildWorkoutPaneHeader(Workout? workout, AppState appState) {
+  final today = Date.today();
+  if (workout != null) {
+    final dateText = workout.date.toString();
+    final isToday = workout.date == today;
+    final isFuture = workout.date > today;
+    String displayText;
+    if (isToday) {
+      displayText = '$dateText (today)';
+    } else if (isFuture) {
+      displayText = '$dateText (planned)';
+    } else {
+      displayText = dateText;
+    }
+    return ListTile(
+      title: Text(displayText),
+    );
+  } else {
+    final workoutExistsForToday = appState.workouts.containsKey(today);
+    final title = workoutExistsForToday
+        ? 'Plan new workout'
+        : 'Add new workout for today';
+    return ListTile(
+      title: Text(title),
+    );
+  }
+}
 
 Widget buildWorkoutPaneContent(AppState appState, Workout? workout, BuildContext context) => Expanded(
   child: SingleChildScrollView(

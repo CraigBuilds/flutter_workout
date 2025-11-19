@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'models.dart';
+import 'backend/models.dart';
 import 'pages/home_page.dart';
-import 'my_router.dart';
+import 'backend/my_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {

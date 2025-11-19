@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models.dart';
-import '../my_router.dart';
+import '../backend/models.dart';
+import '../backend/my_router.dart';
 
 Widget buildHome(AppState appState) => Scaffold(
   appBar: AppBar(

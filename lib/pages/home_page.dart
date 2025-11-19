@@ -27,7 +27,10 @@ PreferredSizeWidget buildHomeAppBar(AppState appState, BuildContext context) => 
 
 Widget buildHomeBody(AppState appState, BuildContext context) => PageView.builder(
   scrollDirection: Axis.horizontal,
-  controller: PageController(viewportFraction: 0.95),
+  controller: PageController(
+    viewportFraction: 0.95,
+    initialPage: getIndexOfTodayWorkout(appState),
+  ),
   itemCount: appState.workouts.length + 1, // +1 for "Plan New Workout" pane
   itemBuilder: (_, i) => buildWorkoutPane(
     appState,
@@ -35,6 +38,17 @@ Widget buildHomeBody(AppState appState, BuildContext context) => PageView.builde
     context,
   ),
 );
+
+int getIndexOfTodayWorkout(AppState appState) {
+  final today = Date.today();
+  final workoutDates = appState.workouts.keys.toList();
+  for (int i = 0; i < workoutDates.length; i++) {
+    if (workoutDates[i] >= today) {
+      return i;
+    }
+  }
+  return appState.workouts.length; // If all workouts are in the past, return the index for "Plan New Workout" pane
+}
 
 // ----- Workout Pane -----
 
@@ -59,11 +73,12 @@ Widget buildWorkoutPaneHeader(Workout? workout, AppState appState) {
     } else if (isFuture) {
       displayText = '$dateText (planned)';
     } else {
-      displayText = dateText;
+      displayText ='$dateText (past)';
     }
     return ListTile(
       title: Text(displayText),
     );
+  //if workout is null, this is the end page
   } else {
     final workoutExistsForToday = appState.workouts.containsKey(today);
     final title = workoutExistsForToday

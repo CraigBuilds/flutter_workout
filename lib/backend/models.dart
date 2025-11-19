@@ -94,6 +94,10 @@ class Date {
       }
       return day > other.day;
   }
+
+  bool operator >= (Date other) {
+      return this > other || this == other;
+  }
   
   @override
   int get hashCode { return year * 10000 + month * 100 + day; }

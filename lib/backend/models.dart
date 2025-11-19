@@ -3,6 +3,34 @@ import 'dart:collection'; //for UnmodifiableMapView
 import 'package:hive/hive.dart'; //for decorators and Box class
 part 'models.g.dart';
 
+@HiveType(typeId: 1)
+class Workout {
+  @HiveField(0)
+  final Date date;
+  @HiveField(1)
+  final List<Exercise> exercises;
+
+  Workout({required this.date, required this.exercises});
+}
+@HiveType(typeId: 2)
+class Exercise {
+  @HiveField(0)
+  final String name;
+  @HiveField(1)
+  final List<ExerciseSet> sets;
+  Exercise({required this.name, required this.sets});
+}
+
+@HiveType(typeId: 3)
+class ExerciseSet {
+  @HiveField(0)
+  final int reps;
+  @HiveField(1)
+  final double weight;
+
+  ExerciseSet({required this.reps, required this.weight});
+}
+
 @HiveType(typeId: 0)
 class Date {
   @HiveField(0)
@@ -48,35 +76,6 @@ class Date {
       int.parse(parts[2]),
     );
   }
-}
-
-// ----- Data Models -----
-@HiveType(typeId: 1)
-class Workout {
-  @HiveField(0)
-  final Date date;
-  @HiveField(1)
-  final List<Exercise> exercises;
-
-  Workout({required this.date, required this.exercises});
-}
-@HiveType(typeId: 2)
-class Exercise {
-  @HiveField(0)
-  final String name;
-  @HiveField(1)
-  final List<ExerciseSet> sets;
-  Exercise({required this.name, required this.sets});
-}
-
-@HiveType(typeId: 3)
-class ExerciseSet {
-  @HiveField(0)
-  final int reps;
-  @HiveField(1)
-  final double weight;
-
-  ExerciseSet({required this.reps, required this.weight});
 }
 
 // ----- Main App State (wrapped map of Date->Workout in a ValueNotifier) -----

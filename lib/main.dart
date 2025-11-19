@@ -3,6 +3,7 @@ import 'backend/models.dart';
 import 'pages/home_page.dart';
 import 'backend/my_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'backend/app_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

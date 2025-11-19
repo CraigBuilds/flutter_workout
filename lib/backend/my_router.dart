@@ -3,6 +3,7 @@ import 'models.dart';
 import '../pages/about_page.dart';
 import '../pages/exercise_selector_page.dart';
 import '../pages/set_logging_page.dart';
+import 'app_state.dart';
 
 class RouteArgs {
   AppState appState;

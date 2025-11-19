@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../backend/models.dart';
 import '../backend/my_router.dart';
+import '../backend/crud.dart';
 
 // This view allows users to select exercises from a tree structure. It is a new page in the app.
 Widget buildExerciseSelectorPage(RouteArgs args) => Scaffold(

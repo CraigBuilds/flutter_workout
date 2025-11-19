@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../backend/models.dart';
 import '../backend/my_router.dart';
+import '../backend/crud.dart';
+import '../backend/app_state.dart';
 
 // This view allows the user to add sets to this exercise (for today's workout), and also view historical data.
 Widget buildSetLoggingPage(RouteArgs args) {
